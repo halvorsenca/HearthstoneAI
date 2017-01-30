@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
-page = urlopen('https://www.google.com/')
-soup = BeautifulSoup(page, 'html.parser')
+page = urlopen('http://www.icy-veins.com/hearthstone/')
+soup = BeautifulSoup(page)
+
+print(soup.prettify())
