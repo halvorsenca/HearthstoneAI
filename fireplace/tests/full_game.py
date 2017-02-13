@@ -4,14 +4,29 @@ from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
 
+##
+# If you get an error about not being able to import cards
+# then make sure you run './setup install' using python3.
+#
+# Any time you make a change to anything that isn't this file
+# run './setup install' in python3 to compile those changes.
+# If you don't the changes will not be reflected during you next
+# run.
+#
+# This will also throw an charmap error in windows because
+# windows is a terrible operating system.
+##
 
 def test_full_game():
 	try:
+    # This will start the game
 		play_full_game()
 	except GameOver:
+    # This will always run whenever the game ends.
 		print("Game completed normally.")
 
 
+# Don't need to worry about this
 def main():
 	cards.db.initialize()
 	if len(sys.argv) > 1:

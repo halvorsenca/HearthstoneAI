@@ -13,6 +13,7 @@ _cards_module = os.path.join(os.path.dirname(__file__), "cards")
 CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 
 
+# Some of the methods in this class may be useful
 class CardList(list):
 	def __contains__(self, x):
 		for item in self:
@@ -117,6 +118,7 @@ def entity_to_xml(entity):
 	return e
 
 
+# This method sucks for what we are trying to do
 def game_state_to_xml(game):
 	tree = ElementTree.Element("HSGameState")
 	tree.append(entity_to_xml(game))
@@ -179,9 +181,23 @@ def setup_game() -> ".game.Game":
 	return game
 
 
+##
+# Start a turn off by looking at a list of playable card.
+# Separate into spells and minions.
+# Check for win condition, if true then go for win.
+# Else, check enemy minions for valuable trades through spells or weaker minions.
+# Then calculate maximum damage that is playable that turn.
+#
+# Things to research:
+#   Maybe make two methods for player1_turn and player2_turn
+#   How to mulligan?
+#
+# Indentation is weird... Need to fix that
+##
 def play_turn(game: ".game.Game") -> ".game.Game":
 	player = game.current_player
 
+# Need to decide whether to use hero power last
 		heropower = player.hero.power
 		if heropower.is_usable() and random.random() < 0.1:
 			if heropower.requires_target():
@@ -191,6 +207,7 @@ def play_turn(game: ".game.Game") -> ".game.Game":
 			continue
 
 		# iterate over our hand and play whatever is playable
+# Change this to calculate maximum damage
 		for card in player.hand:
 			if card.is_playable() and random.random() < 0.5:
 				target = None
@@ -204,10 +221,12 @@ def play_turn(game: ".game.Game") -> ".game.Game":
 				if player.choice:
 					choice = random.choice(player.choice.cards)
 					print("Choosing card %r" % (choice))
-					player.choice.choose(choice)
+          player.choice.choose(choice)
 
 				continue
 
+    # Bot needs to attack hero most of the time, unless there is a threat
+    # or taunt minion.
 		# Randomly attack with whatever can attack
 		for character in player.characters:
 			if character.can_attack():
@@ -222,12 +241,16 @@ def play_full_game() -> ".game.Game":
 	game = setup_game()
 
 	for player in game.players:
+# Need to change how my bot mulligans
 		print("Can mulligan %r" % (player.choice.cards))
 		mull_count = random.randint(0, len(player.choice.cards))
 		cards_to_mulligan = random.sample(player.choice.cards, mull_count)
 		player.choice.choose(*cards_to_mulligan)
 
 	while True:
+    # Need to add break here so that I can see each turn.
+    # Could also add input to skip a number turns or go straight to the end
+    # Also need to figure out how to make instance of the game state
 		play_turn(game)
 
 	return game
