@@ -228,8 +228,6 @@ def play_random_turn(player):
 
 			continue
 
-  # Bot needs to attack hero most of the time, unless there is a threat
-  # or taunt minion.
 	# Randomly attack with whatever can attack
 	for character in player.characters:
 		if character.can_attack():
