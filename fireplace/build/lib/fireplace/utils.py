@@ -171,6 +171,28 @@ def setup_game() -> ".game.Game":
 	from .game import Game
 	from .player import Player
 
+	from pymongo import MongoClient
+
+	client = MongoClient()
+	db = client.test
+
+	heromap = {
+		"WARRIOR": CardClass.WARRIOR.default_hero,
+		"DRUID": CardClass.DRUID.default_hero,
+		"HUNTER": CardClass.HUNTER.default_hero,
+		"MAGE": CardClass.MAGE.default_hero,
+		"PALADIN": CardClass.PALADIN.default_hero,
+		"PRIEST": CardClass.PRIEST.default_hero,
+		"ROGUE": CardClass.ROGUE.default_hero,
+		"WARLOCK": CardClass.WARLOCK.default_hero,
+		"SHAMAN": CardClass.SHAMAN.default_hero,
+	}
+
+	print()
+	print(random.choice(list(heromap.items())))
+	print()
+
+
 	deck1 = random_draft(CardClass.MAGE)
 	deck2 = random_draft(CardClass.WARRIOR)
 	player1 = Player("Player1", deck1, CardClass.MAGE.default_hero)
