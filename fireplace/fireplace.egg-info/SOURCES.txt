@@ -12,6 +12,7 @@ fireplace/game.py
 fireplace/logging.py
 fireplace/managers.py
 fireplace/player.py
+fireplace/playerbot.py
 fireplace/rules.py
 fireplace/targeting.py
 fireplace/utils.py

@@ -6,6 +6,7 @@ from pkgutil import iter_modules
 from typing import List
 from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType
+from . import playerbot
 
 
 # Autogenerate the list of cardset modules
@@ -195,50 +196,11 @@ def setup_game() -> ".game.Game":
 ##
 def play_turn(game: ".game.Game") -> ".game.Game":
 	if game.players[0].current_player:
-		play_aggresive_turn(game)
+		playerbot.play_aggressive_turn(game)
 	elif game.players[1].current_player:
 		play_random_turn(game.players[1])
 	game.end_turn()
 	return game
-
-def play_aggresive_turn(game: ".game.Game"):
-	playable_cards = get_playable_cards(game.players[0].hand)
-	if len(playable_cards) > 0:
-		playable_cards.sort(key=lambda card: card.cost, reverse=True)
-# Check for threats that can be killed by spells
-		for card in playable_cards:
-			if card.data.type is CardType.MINION:
-				target = None
-				if card.must_choose_one:
-# This will need to get elaborated
-					card = random.choice(card.choose_cards)
-				if card.requires_target():
-# This will also need to get elaborated
-					target = random.choice(card.targets)
-				print("Playing %r on %r" % (card, target))
-				card.play(target=target)
-# Need to change this to play more minions if possible
-				break
-
-# Make all minions go face
-	for character in game.players[0].characters:
-		if character.can_attack():
-			character.attack(character.targets[0])
-
-	#if game.players[0].hand[0].data.type is CardType.MINION:
-		#print(game.players[0].hand[0].health)
-		#print(game.players[0].hand[0].atk)
-	#print(game.players[1].field)
-	#print(game.players[1].hero.health)
-	#print(game.players[1].hero.armor)
-
-def get_playable_cards(cards):
-	playable_cards = []
-	for card in cards:
-		if card.is_playable():
-			playable_cards.append(card)
-	return playable_cards
-
 
 def play_random_turn(player):
 	heropower = player.hero.power
