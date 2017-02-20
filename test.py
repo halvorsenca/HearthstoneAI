@@ -1,48 +1,76 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import sys
-#from pymongo import MongoClient
+from pymongo import MongoClient
 
-#client = MongoClient()
-#db = client.test
+client = MongoClient()
+db = client.test
 
-#sys.stdout = open("cards.txt","w")
+sys.stdout = open("cards.txt","w")
 
+heroes = ["warrior", "druid", "hunter", "mage", "paladin", "priest", "rogue", "shaman", "warlock"]
+url = "http://www.icy-veins.com/hearthstone/"
 
-page = urlopen('http://www.icy-veins.com/hearthstone/warrior-standard-decks')
-soup = BeautifulSoup(page,'html.parser')
+#for all the heroes in the heroes list run through an iteration of a list
+for i in range(0,len(heroes)):
+	
+	#create the insertion entry for the hero database
+	insertion_hero = {"HeroName" : heroes[i], "Decks" : []}
 
-deck = soup.find(class_="deck_presentation_name")
+	#create the new url for the open by appending the hero name on the url set above
+	tempUrl = url + heroes[i] + "-standard-decks"
+	page = urlopen(tempUrl)
+	soup = BeautifulSoup(page,'html.parser')
 
-decks = soup.find_all(class_="deck_presentation_name")
+	#will redirect the html files into a someDir and then create a zip file for it
+	with open("someDir/" + heroes[i]+".html","w") as outputfile:
+		outputfile.write(str(soup))
 
-decknum = 1;
+	deck = soup.find(class_="deck_presentation_name")
 
-for link in decks:
-    line = link.a
-    if any(word in line['href'] for word in ("cheap", "budget", "basic")):
-        continue
-    newPage = urlopen("http:" + line['href'])
-    newSoup = BeautifulSoup(newPage,'html.parser')
+	decks = soup.find_all(class_="deck_presentation_name")
 
-    cardTable = newSoup.find('table', class_="deck_card_list")
-    entry = cardTable.find_all('li')
-    for card in entry:
-        amount = int(card.contents[0][0])        
-        name = card.contents[1].contents[0]
-        
-        for x in range(0, amount):
-            result = db.decks.insert_one(
-                {
-                    "deckID": str(decknum),
-                }
-            
+	decknum = 1;
+	
+	#for each link in the decks classification 
+	for link in decks:
+		
+		#create the base entry for the deck database
+		insertion_deck = {"DeckID": decknum, "DeckName" : link.contents[1].contents[0], "Cards" : []}
 
+		line = link.a
+		if any(word in line['href'] for word in ("cheap", "budget", "basic")):
+			continue
 
+		#opens the decks page to retrieve cards
+		newPage = urlopen("http:" + line['href'])
+		newSoup = BeautifulSoup(newPage,'html.parser')
+		with open("someDir/" + link.contents[1].contents[0].replace("/",'') + ".html", "w") as outputfile:
+			outputfile.write(str(newSoup))
 
+		cardTable = newSoup.find('table', class_="deck_card_list")
+		entry = cardTable.find_all('li')
 
-#resultHero = db.heroes.insert_one(
-#    {
-#        #heroname: [deckID1, deckID2, ...]
-#    }
+		#once again will run through each card in the table and gather information about that card
+		for card in entry:
+			amount = int(card.contents[0][0])        
+			name = card.contents[1].contents[0]
+			
+			#if there are multiple of one card it will print it to the deck the number of times needed
+			for x in range(0, amount):
+				insertion_deck['Cards'].append(name)
+
+		#finishes the insertion process for the deck 
+		posts = db.decks
+		insertion_id = posts.insert_one(insertion_deck).inserted_id
+
+		decknum += 1
+
+		print(decknum)
+
+		insertion_hero['Decks'].append(link.contents[1].contents[0])
+
+	
+	heroDb = db.heroes
+	hero_id = heroDb.insert_one(insertion_hero).inserted_id
 
