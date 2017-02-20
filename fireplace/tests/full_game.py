@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys; sys.path.append("..")
 from fireplace import cards
 from fireplace.exceptions import GameOver
