@@ -7,7 +7,7 @@ from typing import List
 from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType
 from . import playerbot
-
+from . import cards
 
 # Autogenerate the list of cardset modules
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
@@ -188,14 +188,30 @@ def setup_game() -> ".game.Game":
 		"SHAMAN": CardClass.SHAMAN.default_hero,
 	}
 
-	print()
-	print(random.choice(list(heromap.items())))
-	print()
+	#get a random hero
+	hero1 = random.choice(list(heromap.keys()))
+	hero1lower = hero1.lower()
 
+	#get the decks from the hero
+	deckmap1 = db.heroes.find({"HeroName" : hero1lower}, {"Decks" : 1, "_id" : 0})
+	for hey in deckmap1:
+		deckerino1 = hey["Decks"]
+	#return a random deck
+	deckchoice1 = random.choice(deckerino1)
+	
+	#get the cards from the random deck
+	cards1 = db.decks.find({"DeckName" : deckchoice1}, {"Cards" : 1, "_id" : 0})
+	for hi in cards1:
+		carderino1 = hi["Cards"]
 
-	deck1 = random_draft(CardClass.MAGE)
+	#create the deck from the ground up 
+	deck1 = []
+	for every in carderino1:
+		deck1.append(cards.filter(name=every))
+	
+
 	deck2 = random_draft(CardClass.WARRIOR)
-	player1 = Player("Player1", deck1, CardClass.MAGE.default_hero)
+	player1 = Player("Player1", deck1, heromap[hero1])
 	player2 = Player("Player2", deck2, CardClass.WARRIOR.default_hero)
 
 	game = Game(players=(player1, player2))
