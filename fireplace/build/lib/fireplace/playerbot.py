@@ -20,7 +20,7 @@ def play_aggressive_turn(game: ".game.Game"):
 				print("Playing %r on %r" % (card, target))
 				card.play(target=target)
 				if game.players[0].choice:
-					choice = random.choice(player.choice.cards)
+					choice = random.choice(game.players[0].choice.cards)
 					print("Choosing card %r" % (choice))
 					game.players[0].choice.choose(choice)
 			break

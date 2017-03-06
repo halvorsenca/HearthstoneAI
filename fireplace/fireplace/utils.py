@@ -7,7 +7,7 @@ from typing import List
 from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType
 from . import playerbot
-
+from . import cards
 
 # Autogenerate the list of cardset modules
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
@@ -171,9 +171,47 @@ def setup_game() -> ".game.Game":
 	from .game import Game
 	from .player import Player
 
-	deck1 = random_draft(CardClass.MAGE)
+	from pymongo import MongoClient
+
+	client = MongoClient()
+	db = client.test
+
+	heromap = {
+		"WARRIOR": CardClass.WARRIOR.default_hero,
+		"DRUID": CardClass.DRUID.default_hero,
+		"HUNTER": CardClass.HUNTER.default_hero,
+		"MAGE": CardClass.MAGE.default_hero,
+		"PALADIN": CardClass.PALADIN.default_hero,
+		"PRIEST": CardClass.PRIEST.default_hero,
+		"ROGUE": CardClass.ROGUE.default_hero,
+		"WARLOCK": CardClass.WARLOCK.default_hero,
+		"SHAMAN": CardClass.SHAMAN.default_hero,
+	}
+
+	#get a random hero
+	hero1 = random.choice(list(heromap.keys()))
+	hero1lower = hero1.lower()
+
+	#get the decks from the hero
+	deckmap1 = db.heroes.find({"HeroName" : hero1lower}, {"Decks" : 1, "_id" : 0})
+	for hey in deckmap1:
+		deckerino1 = hey["Decks"]
+	#return a random deck
+	deckchoice1 = random.choice(deckerino1)
+	
+	#get the cards from the random deck
+	cards1 = db.decks.find({"DeckName" : deckchoice1}, {"Cards" : 1, "_id" : 0})
+	for hi in cards1:
+		carderino1 = hi["Cards"]
+
+	#create the deck from the ground up 
+	deck1 = []
+	for every in carderino1:
+		deck1.append(cards.filter(name=every)[0])
+	
+
 	deck2 = random_draft(CardClass.WARRIOR)
-	player1 = Player("Player1", deck1, CardClass.MAGE.default_hero)
+	player1 = Player("Player1", deck1, heromap[hero1])
 	player2 = Player("Player2", deck2, CardClass.WARRIOR.default_hero)
 
 	game = Game(players=(player1, player2))
