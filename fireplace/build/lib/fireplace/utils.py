@@ -207,7 +207,7 @@ def setup_game() -> ".game.Game":
 	#create the deck from the ground up 
 	deck1 = []
 	for every in carderino1:
-		deck1.append(cards.filter(name=every))
+		deck1.append(cards.filter(name=every)[0])
 	
 
 	deck2 = random_draft(CardClass.WARRIOR)
