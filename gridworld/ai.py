@@ -34,11 +34,12 @@ class Player():
 			self.turnSeq = []
 			while not game.Game_Over():
 				self.Visited[game.currState] += 1
-				if self.Visited[game.currState] > 10000:
-					self.play_optimal(game)
-				else:
-					self.play_random(game)
+				#if self.Visited[game.currState] > 100000:
+					#self.play_optimal(game)
+				#else:
+				self.play_random(game)
 				if game.Game_Over():
+					self.calcQualities()
 					self.turnSeq.append((game.currState, -1))
 				self.calcQualities()
 
@@ -61,16 +62,32 @@ class Player():
 	def play_random(self, game):
 		action = self.Moves[random.randint(0, 3)]
 		self.turnSeq.append((game.currState, action))
-		if not self.turnSeq[-1] in self.StateQualities:
-			self.StateQualities[self.turnSeq[-1]] = 0
+		if self.Visited[self.turnSeq[-1][0]] == 1:
+			self.StateQualities[(self.turnSeq[-1][0],'N')] = 0
+			self.StateQualities[(self.turnSeq[-1][0],'E')] = 0
+			self.StateQualities[(self.turnSeq[-1][0],'S')] = 0
+			self.StateQualities[(self.turnSeq[-1][0],'W')] = 0
 		game.tryMove(action)
 
 	def calcQualities(self):
 		if len(self.turnSeq) == 1:
 			return
-		elif self.turnSeq[-1][0] in [3,7]:
-			self.StateQualities[self.turnSeq[-3]] += ((0.9*self.StateQualities[self.turnSeq[-2]])
-				-self.StateQualities[self.turnSeq[-3]]) / self.Visited[self.turnSeq[-3][0]]
-		self.StateQualities[self.turnSeq[-2]] += ((0.9*self.StateQualities[self.turnSeq[-1]])
-			-self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
+		else:
+			if self.turnSeq[-1][0] == 3:
+				bestaction = 0
+				reward = 100
+			elif self.turnSeq[-1][0] == 7:
+				bestaction = 0
+				reward = -100
+			else:
+				reward = 0
+				directions = [
+					self.StateQualities[(self.turnSeq[-1][0],'N')],
+					self.StateQualities[(self.turnSeq[-1][0],'E')],
+					self.StateQualities[(self.turnSeq[-1][0],'S')],
+					self.StateQualities[(self.turnSeq[-1][0],'W')]
+				]
+				bestaction = self.StateQualities[(self.turnSeq[-1][0],self.Moves[directions.index(max(directions))])]
+			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction)
+				-self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
 
