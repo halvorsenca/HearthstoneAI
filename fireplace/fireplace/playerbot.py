@@ -12,7 +12,7 @@ def play_aggressive_turn(game: ".game.Game"):
 				target = None
 				if card.must_choose_one:
 # Probably don't need to worry about this as much in aggressive play
-# Machine Learning would be much better at making these decisions
+# If deck does have choice cards, we should make the decision ahead of time
 					card = random.choice(card.choose_cards)
 				if card.requires_target():
 # This will also need to get elaborated
@@ -23,7 +23,7 @@ def play_aggressive_turn(game: ".game.Game"):
 					choice = random.choice(game.players[0].choice.cards)
 					print("Choosing card %r" % (choice))
 					game.players[0].choice.choose(choice)
-			break
+				break
 
 # Make all minions go face
 	for character in game.players[0].characters:

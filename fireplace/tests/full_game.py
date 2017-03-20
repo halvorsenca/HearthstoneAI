@@ -3,6 +3,7 @@ import sys; sys.path.append("..")
 from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
+from fireplace.ai import Player
 
 ##
 # If you get an error about not being able to import cards
@@ -18,12 +19,14 @@ from fireplace.utils import play_full_game
 ##
 
 def test_full_game():
-	try:
+	player = Player()
+	player.train()
+	#try:
     # This will start the game
-		play_full_game()
-	except GameOver:
+		#play_full_game()
+	#except GameOver:
     # This will always run whenever the game ends.
-		print("Game completed normally.")
+		#print("Game completed normally.")
 
 
 # Don't need to worry about this

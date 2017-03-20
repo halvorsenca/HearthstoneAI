@@ -1,6 +1,7 @@
 setup.py
 fireplace/__init__.py
 fireplace/actions.py
+fireplace/ai.py
 fireplace/aura.py
 fireplace/card.py
 fireplace/deck.py

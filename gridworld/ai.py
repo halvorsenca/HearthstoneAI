@@ -34,10 +34,10 @@ class Player():
 			self.turnSeq = []
 			while not game.Game_Over():
 				self.Visited[game.currState] += 1
-				#if self.Visited[game.currState] > 100000:
-					#self.play_optimal(game)
-				#else:
-				self.play_random(game)
+				if self.Visited[game.currState] > 100000:
+					self.play_optimal(game)
+				else:
+					self.play_random(game)
 				if game.Game_Over():
 					self.calcQualities()
 					self.turnSeq.append((game.currState, -1))
