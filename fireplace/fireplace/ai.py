@@ -7,22 +7,21 @@ import pickle
 
 class Player():
 	def __init__(self):
-		if os.path.isfile('StateQualities.pkl'):
+		if os.path.isfile('../StateQualities.pkl'):
 			with open('StateQualities.pkl', 'rb') as f:
 				self.StateQualities = pickle.load(f)
 		else:
 # TODO: Add end state somehow!
 			self.StateQualities = {}
-		if os.path.isfile('Visited.pkl'):
+		if os.path.isfile('../Visited.pkl'):
 			with open('Visited.pkl', 'rb') as f:
 				self.Visited = pickle.load(f)
 		else:
 			self.Visited = defaultdict(self.zero)
-# TODO: Replace with list of actions for Hearthstone
-		#self.Moves = {0:'N', 1:'E', 2:'S', 3:'W'}
+		self.Moves = ['Play_Biggest', 'Play_Multiple', 'Trade_Minions', 'Attack_Hero']
 		self.turnSeq = []
 
-# Need this functions o that Visited can be pickled...
+# Need this functions so that Visited can be pickled...
 	def zero(self):
 		return 0
 
@@ -31,7 +30,7 @@ class Player():
 			try:
 				game = setup_game()
 
-###
+### This came from utils.py
 				for player in game.players:
 					print("Can mulligan %r" % (player.choice.cards))
 					mull_count = random.randint(0, len(player.choice.cards))
@@ -65,25 +64,24 @@ class Player():
 # TODO: Will need to update this to work with Hearthstone Actions
 	def play_optimal(self, game, currState):
 		directions = [
-			self.StateQualities[(currState,'N')],
-			self.StateQualities[(currState,'E')],
-			self.StateQualities[(currState,'S')],
-			self.StateQualities[(currState,'W')]
+			self.StateQualities[(currState,self.Moves[0])],
+			self.StateQualities[(currState,self.Moves[1])],
+			self.StateQualities[(currState,self.Moves[2])],
+			self.StateQualities[(currState,self.Moves[3])]
 		]
 		action = self.Moves[directions.index(max(directions))]
 		self.turnSeq.append((game.currState, action))
 		game.tryMove(action)
 
 	def play_random(self, game, currState):
-# There is a better way to randomly pick something from a list
-		action = self.Moves[random.randint(0, 3)]
+		action = random.choice(self.Moves)
 		self.turnSeq.append((currState, action))
 		if self.Visited[self.turnSeq[-1][0]] == 1:
 # TODO: Need to update with Hearthstone Actions
-			self.StateQualities[(self.turnSeq[-1][0],'N')] = 0
-			self.StateQualities[(self.turnSeq[-1][0],'E')] = 0
-			self.StateQualities[(self.turnSeq[-1][0],'S')] = 0
-			self.StateQualities[(self.turnSeq[-1][0],'W')] = 0
+			self.StateQualities[(self.turnSeq[-1][0],self.Moves[0])] = 0
+			self.StateQualities[(self.turnSeq[-1][0],self.Moves[1])] = 0
+			self.StateQualities[(self.turnSeq[-1][0],self.Moves[2])] = 0
+			self.StateQualities[(self.turnSeq[-1][0],self.Moves[3])] = 0
 		game.tryMove(action)
 
 # This had None for FieldHealths and myDmg
@@ -95,7 +93,7 @@ class Player():
 		enemyDmg = self.get_field_damage(game.players[1])
 		enemyFieldHealth = self.getMinionHealth(game.players[1])
 		myFieldHealth = self.getMinionHealth(game.players[0])
-	# Going to ignore secrets for the time being
+# Going to ignore secrets for the time being
 		return (health, handCards, numMinions, myDmg, enemyDmg, myFieldHealth, enemyFieldHealth)
 
 	def getMinionHealth(self, player):
@@ -127,12 +125,11 @@ class Player():
 				reward = -100
 			else:
 				reward = 0
-# TODO: Need to update with Hearthstone Actions
 				directions = [
-					self.StateQualities[(self.turnSeq[-1][0],'N')],
-					self.StateQualities[(self.turnSeq[-1][0],'E')],
-					self.StateQualities[(self.turnSeq[-1][0],'S')],
-					self.StateQualities[(self.turnSeq[-1][0],'W')]
+					self.StateQualities[(self.turnSeq[-1][0],self.Moves[0])],
+					self.StateQualities[(self.turnSeq[-1][0],self.Moves[1])],
+					self.StateQualities[(self.turnSeq[-1][0],self.Moves[2])],
+					self.StateQualities[(self.turnSeq[-1][0],self.Moves[3])]
 				]
 				bestaction = self.StateQualities[(self.turnSeq[-1][0],self.Moves[directions.index(max(directions))])]
 			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction)

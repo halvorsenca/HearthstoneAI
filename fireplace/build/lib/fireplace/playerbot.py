@@ -38,6 +38,18 @@ def play_aggressive_turn(game: ".game.Game"):
 	#print(game.players[1].hero.armor)
 
 
+def play_biggest_minion():
+	print("Playing Biggest Minion")
+
+def play_multiple_minions():
+	print("Playing multiple_minions")
+
+def trade_minions():
+	print("Trade minions")
+
+def attack_hero():
+	print("Attack Hero")
+
 def get_playable_cards(cards):
 	playable_cards = []
 	for card in cards:
