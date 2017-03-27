@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import sys; sys.path.append("..")
+import logging
+from fireplace.logging import get_logger 
 from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
 from fireplace.ai import Player
-
 ##
 # If you get an error about not being able to import cards
 # then make sure you run './setup install' using python3.
@@ -20,6 +21,9 @@ from fireplace.ai import Player
 
 def test_full_game():
 	player = Player()
+	verbosity = input("Silent(s) or Verbose(v): ")
+	if verbosity == 's':
+		log = get_logger("fireplace", logging.WARNING) 
 	player.train()
 	#try:
     # This will start the game
