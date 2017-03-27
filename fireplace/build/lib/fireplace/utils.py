@@ -6,6 +6,7 @@ from pkgutil import iter_modules
 from typing import List
 from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType
+from .logging import log 
 from . import playerbot
 from . import cards
 
@@ -256,7 +257,7 @@ def play_random_turn(player):
 				card = random.choice(card.choose_cards)
 			if card.requires_target():
 				target = random.choice(card.targets)
-			print("Playing %r on %r" % (card, target))
+			log.info("Playing %r on %r" % (card, target))
 			card.play(target=target)
 
 			if player.choice:

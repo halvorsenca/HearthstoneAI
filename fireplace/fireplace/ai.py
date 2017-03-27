@@ -1,4 +1,5 @@
 from fireplace.exceptions import GameOver
+from .logging import log 
 from fireplace.utils import setup_game, play_turn
 from collections import defaultdict
 import os.path
@@ -32,7 +33,7 @@ class Player():
 
 ### This came from utils.py
 				for player in game.players:
-					print("Can mulligan %r" % (player.choice.cards))
+					log.info("Can mulligan %r" % (player.choice.cards))
 					mull_count = random.randint(0, len(player.choice.cards))
 					cards_to_mulligan = random.sample(player.choice.cards, mull_count)
 					player.choice.choose(*cards_to_mulligan)
@@ -54,7 +55,7 @@ class Player():
 				#self.calcQualities()
 				self.turnSeq.append((currState, -1))
 				#self.calcQualities()
-				print("Game Completed")
+				log.info("Game Completed")
 
 		with open('StateQualities.pkl', 'wb') as f:
 			pickle.dump(self.StateQualities, f, pickle.HIGHEST_PROTOCOL)

@@ -1,4 +1,5 @@
 import random
+from .logging import log
 from hearthstone.enums import CardType
 
 
@@ -17,7 +18,7 @@ def play_aggressive_turn(game: ".game.Game"):
 				if card.requires_target():
 # This will also need to get elaborated
 					target = random.choice(card.targets)
-				print("Playing %r on %r" % (card, target))
+				log.info("Playing %r on %r" % (card, target))
 				card.play(target=target)
 				if game.players[0].choice:
 					choice = random.choice(game.players[0].choice.cards)
