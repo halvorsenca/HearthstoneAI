@@ -231,7 +231,6 @@ def setup_game() -> ".game.Game":
 # Things to research:
 #   Maybe make two methods for player1_turn and player2_turn
 #   How to mulligan?
-#
 ##
 def play_turn(game: ".game.Game") -> ".game.Game":
 	if game.players[0].current_player:

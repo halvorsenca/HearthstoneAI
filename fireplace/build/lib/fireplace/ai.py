@@ -12,14 +12,12 @@ class Player():
 			with open('StateQualities.pkl', 'rb') as f:
 				self.StateQualities = pickle.load(f)
 		else:
-# TODO: Add end state somehow!
 			self.StateQualities = {}
 		if os.path.isfile('../Visited.pkl'):
 			with open('Visited.pkl', 'rb') as f:
 				self.Visited = pickle.load(f)
 		else:
 			self.Visited = defaultdict(self.zero)
-# TODO: Replace with list of actions for Hearthstone
 		self.Moves = ['Play_Biggest', 'Play_Multiple', 'Trade_Minions', 'Attack_Hero']
 		self.turnSeq = []
 
@@ -49,6 +47,7 @@ class Player():
 						print("This shouldn't run")
 						#self.play_optimal(game, currState)
 					else:
+# TODO: Need to randomly pick an action to perform
 						play_turn(game)
 						#self.play_random(game, currState)
 					#self.calcQualities()
@@ -119,12 +118,13 @@ class Player():
 		if len(self.turnSeq) == 1:
 			return
 		else:
-			if self.turnSeq[-1][0] == 3:
+			if self.turnSeq[-1][1] == -1:
 				bestaction = 0
-				reward = 100
-			elif self.turnSeq[-1][0] == 7:
-				bestaction = 0
-				reward = -100
+# If I have more health then I won
+				if self.turnSeq[-1][0][0] > 0:
+					reward = 100
+				else:
+					reward = -100
 			else:
 				reward = 0
 				directions = [

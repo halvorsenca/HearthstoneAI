@@ -4,32 +4,9 @@ from hearthstone.enums import CardType
 
 
 def play_aggressive_turn(game: ".game.Game"):
-	playable_cards = get_playable_cards(game.players[0].hand)
-	if len(playable_cards) > 0:
-		playable_cards.sort(key=lambda card: card.cost, reverse=True)
-# Check for threats that can be killed by spells
-		for card in playable_cards:
-			if card.data.type is CardType.MINION:
-				target = None
-				if card.must_choose_one:
-# Probably don't need to worry about this as much in aggressive play
-# If deck does have choice cards, we should make the decision ahead of time
-					card = random.choice(card.choose_cards)
-				if card.requires_target():
-# This will also need to get elaborated
-					target = random.choice(card.targets)
-				log.info("Playing %r on %r" % (card, target))
-				card.play(target=target)
-				if game.players[0].choice:
-					choice = random.choice(game.players[0].choice.cards)
-					print("Choosing card %r" % (choice))
-					game.players[0].choice.choose(choice)
-				break
-
+	play_biggest_minion(game.players[0])
 # Make all minions go face
-	for character in game.players[0].characters:
-		if character.can_attack():
-			character.attack(character.targets[0])
+	attack_hero(game.players[0])
 
 	#if game.players[0].hand[0].data.type is CardType.MINION:
 		#print(game.players[0].hand[0].health)
@@ -39,16 +16,40 @@ def play_aggressive_turn(game: ".game.Game"):
 	#print(game.players[1].hero.armor)
 
 
-def play_biggest_minion():
+# Play the biggest minion in hand
+def play_biggest_minion(player):
+	playable_cards = get_playable_cards(player.hand)
+	if len(playable_cards) > 0:
+		playable_cards.sort(key=lambda card: card.cost, reverse=True)
+		for card in playable_cards:
+			if card.data.type is CardType.MINION:
+				target = None
+				if card.must_choose_one:
+					card = random.choice(card.choose_cards)
+				if card.requires_target():
+					target = random.choice(card.targets)
+				log.info("Playing %r on %r" % (card, target))
+				card.play(target=target)
+				if player.choice:
+					choice = random.choice(player.choice.cards)
+					log.info("Choosing card %r" % (choice))
+					player.choice.choose(choice)
+				break
 	print("Playing Biggest Minion")
 
+# Play several smaller minions in hand
 def play_multiple_minions():
 	print("Playing multiple_minions")
 
+# make efficient trades then attack hero
 def trade_minions():
 	print("Trade minions")
 
-def attack_hero():
+# Attack hero with everything
+def attack_hero(player):
+	for character in player.characters:
+		if character.can_attack():
+			character.attack(character.targets[0])
 	print("Attack Hero")
 
 def get_playable_cards(cards):
