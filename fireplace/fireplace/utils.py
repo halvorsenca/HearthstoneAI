@@ -201,19 +201,26 @@ def setup_game() -> ".game.Game":
 	deckchoice1 = random.choice(deckerino1)
 	
 	#get the cards from the random deck
-	cards1 = db.decks.find({"DeckName" : deckchoice1}, {"Cards" : 1, "_id" : 0})
-	for hi in cards1:
-		carderino1 = hi["Cards"]
+	#cards1 = db.decks.find({"DeckName" : deckchoice1}, {"Cards" : 1, "_id" : 0})
+	#for hi in cards1:
+	#	carderino1 = hi["Cards"]
 
 	#create the deck from the ground up 
-	deck1 = []
-	for every in carderino1:
-		deck1.append(cards.filter(name=every)[0])
+	#deck1 = []
+	#for every in carderino1:
+	#	deck1.append(cards.filter(name=every)[0])
 	
+	cards2 = db.decks.find({"DeckName" : "Hand Lock"}, {"Cards" : 1, "_id" : 0})
+	for neat in cards2:
+		carderino2 = neat["Cards"]
+	
+	deck2 = []
+	for hello in carderino2:
+		deck2.append(cards.filter(name=hello)[0])
 
-	deck2 = random_draft(CardClass.WARRIOR)
-	player1 = Player("Player1", deck1, heromap[hero1])
-	player2 = Player("Player2", deck2, CardClass.WARRIOR.default_hero)
+	deck1 = random_draft(CardClass.HUNTER)
+	player2 = Player("Player2", deck1, CardClass.HUNTER.default_hero)
+	player1 = Player("Player1", deck2, CardClass.WARLOCK.default_hero)
 
 	game = Game(players=(player1, player2))
 	game.start()
