@@ -70,6 +70,10 @@ for i in range(0,len(heroes)):
 
 		insertion_hero['Decks'].append(link.contents[1].contents[0])
 
+
+	
+	if 'warlock' in insertion_hero['HeroName']:
+		insertion_hero['Decks'].append("Hand Lock")
 	
 	heroDb = db.heroes
 	hero_id = heroDb.insert_one(insertion_hero).inserted_id
