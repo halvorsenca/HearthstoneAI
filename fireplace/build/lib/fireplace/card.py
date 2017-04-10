@@ -1,3 +1,4 @@
+import logging
 from itertools import chain
 from hearthstone.enums import CardType, PlayReq, PlayState, Race, Rarity, Step, Zone
 from . import actions, cards, rules
@@ -76,7 +77,7 @@ class BaseCard(BaseEntity):
 		old = self.zone
 
 		if old == value:
-			self.logger.warning("%r attempted a same-zone move in %r", self, old)
+			self.logger.info("%r attempted a same-zone move in %r", self, old)
 			return
 
 		if old:
