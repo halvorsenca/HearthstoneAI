@@ -212,8 +212,8 @@ def setup_game() -> ".game.Game":
 	
 
 	deck2 = random_draft(CardClass.WARRIOR)
-	player1 = Player("Player1", deck1, heromap[hero1])
-	player2 = Player("Player2", deck2, CardClass.WARRIOR.default_hero)
+	player2 = Player("Player2", deck1, heromap[hero1])
+	player1 = Player("Player1", deck2, CardClass.WARRIOR.default_hero)
 
 	game = Game(players=(player1, player2))
 	game.start()
