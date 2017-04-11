@@ -40,28 +40,28 @@ def play_utility():
 # Ancient Watcher, Earthen Ring Farseer, Mistress of Mixtures, Lord Jaraxxus
 # Always heal damaged minions, else heal hero if none to heal
 	card_ids = []
-  playable_cards = get_playable_cards(player.hand)
-  if len(playable_cards) > 0:
-    for card in playable_cards:
+	playable_cards = get_playable_cards(player.hand)
+	if len(playable_cards) > 0:
+		for card in playable_cards:
 			if card in card_ids:
 #TODO: Earthern ring Farseer needs Target
 				card.play()
 				return True
-  return False
+	return False
 
 def trade_spell(game):
 #Mortal Coil, Shadow Bolt, Siphon Soul
 # Check if spells exist, then search for minions with 1 or 4 health
 # Update card_ids to determine which to cast and on who
 	card_ids = []
-  playable_cards = get_playable_cards(player.hand)
-  if len(playable_cards) > 0:
-    for card in playable_cards:
+	playable_cards = get_playable_cards(player.hand)
+	if len(playable_cards) > 0:
+		for card in playable_cards:
 			if card in card_ids:
 # TODO: All cards need targets
 				card.play()
 				return True
-  return False
+	return False
 
 # make efficient trades then attack hero
 def trade_minions(game):
@@ -99,30 +99,30 @@ def find_largest_minion(field):
 def wipe_field(player):
 # Doomsayer, Hellfire, Shadowflame, Twisting Nether, Abysal Enforcer
 	card_ids = []
-  playable_cards = get_playable_cards(player.hand)
-  if len(playable_cards) > 0:
-    for card in playable_cards:
+	playable_cards = get_playable_cards(player.hand)
+	if len(playable_cards) > 0:
+		for card in playable_cards:
 			if card in card_ids:
 # TODO: Shadowflame needs target
 				card.play()
 				return True
-  return False
+	return False
 
 # Attack hero with everything that can attack
 def attack_hero(player):
-  result = False
+	result = False
 	for character in player.characters:
 		if character.can_attack():
 			character.attack(character.targets[0])
-      result = True
-  return result
+			result = True
+	return result
 
 # Use the Hero Power
 def use_hero_power(player):
-  if player.hero.power.is_usable():
-    player.hero.power.use()
-    return True
-  return False
+	if player.hero.power.is_usable():
+		player.hero.power.use()
+		return True
+	return False
 
 def get_playable_cards(cards):
 	playable_cards = []

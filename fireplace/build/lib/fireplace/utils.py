@@ -214,8 +214,6 @@ def setup_game() -> ".game.Game":
 	for neat in cards2:
 		carderino2 = neat["Cards"]
 	
-	print(carderino2)
-
 	deck2 = []
 	for hello in carderino2:
 		deck2.append(cards.filter(name=hello)[0])
@@ -240,11 +238,10 @@ def setup_game() -> ".game.Game":
 # Things to research:
 #   Maybe make two methods for player1_turn and player2_turn
 #   How to mulligan?
-#
 ##
 def play_turn(game: ".game.Game") -> ".game.Game":
 	if game.players[0].current_player:
-		playerbot.play_aggressive_turn(game)
+		play_random_turn(game.players[0])
 	elif game.players[1].current_player:
 		play_random_turn(game.players[1])
 	game.end_turn()

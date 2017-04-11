@@ -19,8 +19,9 @@ class Player():
 		else:
 			# This initializes every new entry with a zero
 			self.Visited = defaultdict(self.zero)
-		self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
-						trade_minions, wipe_field, attack_hero, use_hero_power]
+		self.Moves = []
+		#self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
+						#trade_minions, wipe_field, attack_hero, use_hero_power]
 		self.turnSeq = []
 
 # Need this functions so that Visited can be pickled...
@@ -44,6 +45,7 @@ class Player():
 # Play each turn
 				while True:
 					currState = self.extract_gamestate(game)
+					print(currState)
 					self.Visited[currState] += 1
 					#if self.Visited[currState] > 100000:
 						#print("This shouldn't run")
@@ -93,27 +95,26 @@ class Player():
 		myHealth = game.players[0].hero.health + game.players[0].hero.armor
 		enemyHealth = game.players[1].hero.health + game.players[1].hero.armor
 
-		cardAdvantage = (len(game.players[0].hand) + len(game.players[0].field))
-											- (len(game.players[1].hand) + len(game.players[1].field))
+		cardAdvantage = (len(game.players[0].hand) + len(game.players[0].field)) - (len(game.players[1].hand) + len(game.players[1].field))
 
 # TODO: Need to figure out None issue
 		totalDamage = self.get_field_damage(game.players[0])
 
-		strongestEnemy = self.get_strongest_enemy(game.players[1])
+		strongestEnemy = self.get_strongest_enemy(game)
 
 # TODO: This probably isn't going to work
 		jaraxxus = game.players[0].hero.id == 'EX1_323h'
 
 		return (myHealth, enemyHealth, cardAdvantage, totalDamage, strongestEnemy, jaraxxus)
 	
-	def get_strongest_enemy(game):
+	def get_strongest_enemy(self, game):
 		strongest = None
 		for minion in game.players[1].field:
-			if minion.health > strongest.health:
+			if strongest == None or minion.health > strongest.health:
 				strongest = minion
 			elif minion.health == strongest.health and minion.atk > strongest.atk:
 				strongest = minion
-		return strongest.health
+		return 0 if strongest == None else strongest.health
 	
 # TODO: None error
 	def get_field_damage(self, player):

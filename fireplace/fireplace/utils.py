@@ -241,7 +241,7 @@ def setup_game() -> ".game.Game":
 ##
 def play_turn(game: ".game.Game") -> ".game.Game":
 	if game.players[0].current_player:
-		playerbot.play_aggressive_turn(game)
+		play_random_turn(game.players[0])
 	elif game.players[1].current_player:
 		play_random_turn(game.players[1])
 	game.end_turn()
