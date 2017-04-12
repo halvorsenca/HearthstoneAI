@@ -2,6 +2,7 @@ from fireplace.exceptions import GameOver
 from .logging import log 
 from fireplace.utils import setup_game, play_turn
 from collections import defaultdict
+from fireplace.playerbot import play_offensive, play_defensive, play_utility, trade_spell, trade_minions, wipe_field, attack_hero, use_hero_power, end_turn
 import os.path
 import random
 import pickle
@@ -19,9 +20,8 @@ class Player():
 		else:
 			# This initializes every new entry with a zero
 			self.Visited = defaultdict(self.zero)
-		self.Moves = []
-		#self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
-						#trade_minions, wipe_field, attack_hero, use_hero_power]
+		self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
+								trade_minions, wipe_field, attack_hero, use_hero_power, end_turn]
 		self.turnSeq = []
 
 # Need this functions so that Visited can be pickled...
@@ -31,7 +31,9 @@ class Player():
 	def train(self):
 		for _ in range(0, int(input("How many games: "))):
 			try:
+				print("About to startup the game!")
 				game = setup_game()
+				print("Game setup!")
 
 ### This came from utils.py
 				for player in game.players:
@@ -43,6 +45,7 @@ class Player():
 
 				self.turnSeq = []
 # Play each turn
+				print("Game is about to start!")
 				while True:
 					currState = self.extract_gamestate(game)
 					print(currState)
@@ -51,11 +54,15 @@ class Player():
 						#print("This shouldn't run")
 						#self.play_optimal(game, currState)
 					#else:
-					play_turn(game)
-					#self.play_random(game, currState)
+					if game.players[0].current_player:
+						self.play_random(game, currState)
+					elif game.players[1].current_player:
+						play_turn(game)
 					#self.calcQualities()
 			except GameOver:
 				#self.calcQualities()
+				currState = self.extract_gamestate(game)
+				print(currState)
 				self.turnSeq.append((currState, -1))
 				#self.calcQualities()
 				log.info("Game Completed")
@@ -66,20 +73,10 @@ class Player():
 		with open('Visited.pkl', 'wb') as f:
 			pickle.dump(self.Visited, f, pickle.HIGHEST_PROTOCOL)
 
-	def play_optimal(self, game, currState):
-		directions = [
-			self.StateQualities[(currState,self.Moves[0])],
-			self.StateQualities[(currState,self.Moves[1])],
-			self.StateQualities[(currState,self.Moves[2])],
-			self.StateQualities[(currState,self.Moves[3])]
-		]
-		action = self.Moves[directions.index(max(directions))]
-		self.turnSeq.append((game.currState, action))
-		game.tryMove(action)
 
 	def play_random(self, game, currState):
 		did_action = False
-		action = ''
+		action = None
 
 		while not did_action:
 			action = random.choice(self.Moves)
@@ -97,15 +94,15 @@ class Player():
 
 		cardAdvantage = (len(game.players[0].hand) + len(game.players[0].field)) - (len(game.players[1].hand) + len(game.players[1].field))
 
-# TODO: Need to figure out None issue
 		totalDamage = self.get_field_damage(game.players[0])
 
 		strongestEnemy = self.get_strongest_enemy(game)
 
-# TODO: This probably isn't going to work
 		jaraxxus = game.players[0].hero.id == 'EX1_323h'
 
-		return (myHealth, enemyHealth, cardAdvantage, totalDamage, strongestEnemy, jaraxxus)
+		mana = (game.players[0].max_mana - game.players[0].used_mana) + game.players[0].temp_mana
+
+		return (myHealth, enemyHealth, mana, cardAdvantage, totalDamage, strongestEnemy, jaraxxus)
 	
 	def get_strongest_enemy(self, game):
 		strongest = None
@@ -116,7 +113,6 @@ class Player():
 				strongest = minion
 		return 0 if strongest == None else strongest.health
 	
-# TODO: None error
 	def get_field_damage(self, player):
 		dmg = 0
 		for minion in player.field:
@@ -130,6 +126,8 @@ class Player():
 			if self.turnSeq[-1][1] == -1:
 				bestaction = 0
 # If I have more health then I won
+# TODO: This logic might have to change
+# Could also add rewards for having card advantage
 				if self.turnSeq[-1][0][0] > 0:
 					reward = 100
 				else:
@@ -143,3 +141,17 @@ class Player():
 			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction)
 				-self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
 
+	"""
+	Will have to update this to reflect updates before making optimal plays
+	but don't really need it until after the game has been trained
+	def play_optimal(self, game, currState):
+		directions = [
+			self.StateQualities[(currState,self.Moves[0])],
+			self.StateQualities[(currState,self.Moves[1])],
+			self.StateQualities[(currState,self.Moves[2])],
+			self.StateQualities[(currState,self.Moves[3])]
+		]
+		action = self.Moves[directions.index(max(directions))]
+		self.turnSeq.append((game.currState, action))
+		game.tryMove(action)
+	"""
