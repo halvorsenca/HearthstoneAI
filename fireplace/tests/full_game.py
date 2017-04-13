@@ -21,8 +21,8 @@ from fireplace.ai import Player
 ##
 
 def test_full_game():
-	numThreads = int(input("How many players: "))
-	numGames = int(input("How many games per player: "))
+	numThreads = int(input("How many threads: "))
+	numGames = int(input("How many games per thread: "))
 
 	verbosity = input("Silent(s) or Verbose(v): ")
 	if verbosity == 's':
