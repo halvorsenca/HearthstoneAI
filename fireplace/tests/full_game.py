@@ -29,13 +29,13 @@ def test_full_game():
 	if verbosity == 's':
 		log = get_logger("fireplace", logging.WARNING) 
 
+	start_time = time.time()
 	threads = []
 	for i in range(0, numThreads):
 		thread = threading.Thread(target=Player, args = (numGames,i))
-		time.sleep(0.5)
+		time.sleep(0.1)
 		thread.start()
 		threads.append(thread)
-		print("Started thread ", i)
 
 	print("Started all threads successfully!")
 
@@ -43,7 +43,9 @@ def test_full_game():
 	for thread in threads:
 		thread.join()
 
-	print("Finished!")
+	finish_time = time.time()
+
+	print("Finish time: ", finish_time - start_time)
 	#try:
     # This will start the game
 		#play_full_game()
