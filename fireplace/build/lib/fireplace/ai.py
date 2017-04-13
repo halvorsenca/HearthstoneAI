@@ -9,12 +9,14 @@ import pickle
 
 class Player():
 	def __init__(self):
-		if os.path.isfile('../StateQualities.pkl'):
+		if os.path.isfile('StateQualities.pkl'):
 			with open('StateQualities.pkl', 'rb') as f:
+				print("Loading File")
 				self.StateQualities = pickle.load(f)
 		else:
+			print("Not Loading")
 			self.StateQualities = {}
-		if os.path.isfile('../Visited.pkl'):
+		if os.path.isfile('Visited.pkl'):
 			with open('Visited.pkl', 'rb') as f:
 				self.Visited = pickle.load(f)
 		else:
@@ -60,6 +62,9 @@ class Player():
 				self.turnSeq.append((currState, -1))
 				self.calcQualities()
 				log.info("Game Completed")
+				import pprint
+				pp = pprint.PrettyPrinter(indent=2)
+				pp.pprint(self.StateQualities)
 
 # TODO: Need to switch to using JSON because pkl could loss information
 		with open('StateQualities.pkl', 'wb') as f:

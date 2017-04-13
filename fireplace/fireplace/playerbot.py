@@ -139,8 +139,10 @@ def trade_minions(game):
 			targets = minions[0].targets
 			targets.sort(key=lambda minion: minion.atk + minion.health)
 			#print("Attacking with: ", minions[0], "\nTarget: ", targets[0])
-			minions[0].attack(targets[0])
-			return True
+			for target in targets:
+				if not target is game.players[1].hero:
+					minions[0].attack(target)
+					return True
 	return False
 
 def wipe_field(game):
