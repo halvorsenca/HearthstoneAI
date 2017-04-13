@@ -5,23 +5,21 @@ from collections import defaultdict
 from fireplace.playerbot import play_offensive, play_defensive, play_utility, trade_spell, trade_minions, wipe_field, attack_hero, use_hero_power, end_turn
 import os.path
 import random
-import pickle
+import json
 
 class Player():
 	def __init__(self, numGames, threadNum):
-		if os.path.isfile('StateQualities.pkl'):
-			with open('StateQualities.pkl', 'rb') as f:
-				print("Loading File")
-				self.StateQualities = pickle.load(f)
+		if os.path.isfile('StateQualities.json'):
+			with open('StateQualities.json', 'r') as infile:
+				self.StateQualities = json.load(infile)
 		else:
-			print("Not Loading")
 			self.StateQualities = {}
-		if os.path.isfile('Visited.pkl'):
-			with open('Visited.pkl', 'rb') as f:
-				self.Visited = pickle.load(f)
+		if os.path.isfile('Visited.json'):
+			with open('Visited.json', 'r') as infile:
+				self.Visited = json.load(infile)
 		else:
 			# This initializes every new entry with a zero
-			self.Visited = defaultdict(self.zero)
+			self.Visited = {}
 
 		self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
 								trade_minions, wipe_field, attack_hero, use_hero_power, end_turn]
@@ -30,16 +28,16 @@ class Player():
 
 		self.train(numGames)
 
-# TODO: Need to switch to using JSON because pkl could loss information
-		with open('Output/StateQualities'+str(self.threadNum)+'.pkl', 'wb') as f:
-			pickle.dump(self.StateQualities, f, pickle.HIGHEST_PROTOCOL)
-		with open('Output/Visited'+str(self.threadNum)+'.pkl', 'wb') as f:
-			pickle.dump(self.Visited, f, pickle.HIGHEST_PROTOCOL)
-
-
-# Need this functions so that Visited can be pickled...
-	def zero(self):
-		return 0
+		with open('Output/StateQualities'+str(self.threadNum)+'.json', 'w') as outfile:
+			tmp = {}
+			for key, value in self.StateQualities.items():
+				tmp[str(key)] = value
+			json.dump(tmp, outfile)
+		with open('Output/Visited'+str(self.threadNum)+'.json', 'w') as outfile:
+			tmp = {}
+			for key, value in self.Visited.items():
+				tmp[str(key)] = value
+			json.dump(tmp, outfile)
 
 	def train(self, numGames):
 		for _ in range(0, numGames):
@@ -62,6 +60,8 @@ class Player():
 					#else:
 					if game.players[0].current_player:
 						currState = self.extract_gamestate(game)
+						if not currState in self.Visited.keys():
+							self.Visited[currState] = 0
 						self.Visited[currState] += 1
 						self.play_random(game, currState)
 						self.calcQualities()
