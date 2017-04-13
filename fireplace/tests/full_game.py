@@ -2,6 +2,7 @@
 import sys; sys.path.append("..")
 import logging
 import threading
+import time
 from fireplace.logging import get_logger 
 from fireplace import cards
 from fireplace.exceptions import GameOver
@@ -31,8 +32,10 @@ def test_full_game():
 	threads = []
 	for i in range(0, numThreads):
 		thread = threading.Thread(target=Player, args = (numGames,i))
+		time.sleep(0.5)
 		thread.start()
 		threads.append(thread)
+		print("Started thread ", i)
 
 	print("Started all threads successfully!")
 
