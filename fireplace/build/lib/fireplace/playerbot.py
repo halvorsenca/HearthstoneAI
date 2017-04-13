@@ -43,7 +43,7 @@ def play_defensive(game):
 			if card.id in card_ids:
 				if card.id == card_ids[2]:
 					target = None
-					for minion in game.players[0].field:
+					for minion in card.targets:
 						if target == None or target.health < minion.health:
 							target = minion
 						elif target.health == minion.health and target.atk < minion.atk:
@@ -64,7 +64,7 @@ def play_defensive(game):
 						else:
 							currStat = prev_minion.health + minion.health
 							if currStat > prevStat:
-								prevStat = currState
+								prevStat = currStat
 								play = i
 					card.play(index=play)
 					return True
@@ -81,8 +81,8 @@ def play_utility(game):
 			if card in card_ids:
 				if card.id == card_ids[1]:
 					targets = []
-					for minion in game.players[0].field:
-						if minion.max_health - 3 >= minion.health:
+					for minion in card.targets:
+						if minion.max_health - 3 >= minion.health and not minion in game.players[1].characters:
 							targets.append(minion)
 					if len(targets) > 0:
 						targets.sort(key=lambda minion: minion.atk + minion.max_health, reverse=True)
@@ -116,9 +116,10 @@ def trade_spell(game):
 				else:
 					health = 999
 				targets = []
-				for enemy in game.players[1].field:
-					if enemy.health <= health:
-						targets.append(enemy)
+				for enemy in card.targets:
+					if enemy in game.players[1].field:
+						if enemy.health <= health:
+							targets.append(enemy)
 				if len(targets) > 0:
 					targets.sort(key=lambda minion: minion.atk, reverse=True)
 					card.play(target=targets[0])
@@ -128,7 +129,8 @@ def trade_spell(game):
 # make efficient trades then attack hero
 def trade_minions(game):
 	minions = []
-	for minion in game.players[0].field:
+	field = list(game.players[0].field)
+	for minion in field:
 		if minion.can_attack():
 			minions.append(minion)
 	if len(minions) > 0:
@@ -136,6 +138,7 @@ def trade_minions(game):
 		if len(minions[0].targets) > 0:
 			targets = minions[0].targets
 			targets.sort(key=lambda minion: minion.atk + minion.health)
+			#print("Attacking with: ", minions[0], "\nTarget: ", targets[0])
 			minions[0].attack(targets[0])
 			return True
 	return False
@@ -149,11 +152,11 @@ def wipe_field(game):
 			if card in card_ids:
 				if card.id == card_ids[2]:
 					strongest = 0
-					for enemy in game.players[1].field:
+					for enemy in game.players[0].field:
 						if enemy.health > strongest:
 							strongest = enemy.health
 					targets = []
-					for minion in game.players[0].field:
+					for minion in card.targets:
 						if minion.atk >= strongest:
 							targets.append(minion)
 					if len(targets) > 0:
@@ -168,8 +171,10 @@ def wipe_field(game):
 # Attack hero with everything that can attack
 def attack_hero(game):
 	result = False
-	for character in game.players[0].characters:
+	characters = list(game.players[0].characters)
+	for character in characters:
 		if character.can_attack():
+			#print("Attacking with: ", character, "\nTarget: ", character.targets[0])
 			character.attack(character.targets[0])
 			result = True
 	return result

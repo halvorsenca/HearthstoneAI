@@ -190,15 +190,15 @@ def setup_game() -> ".game.Game":
 	}
 
 	#get a random hero
-	hero1 = random.choice(list(heromap.keys()))
-	hero1lower = hero1.lower()
+	#hero1 = random.choice(list(heromap.keys()))
+	#hero1lower = hero1.lower()
 
 	#get the decks from the hero
-	deckmap1 = db.heroes.find({"HeroName" : hero1lower}, {"Decks" : 1, "_id" : 0})
-	for hey in deckmap1:
-		deckerino1 = hey["Decks"]
+	#deckmap1 = db.heroes.find({"HeroName" : hero1lower}, {"Decks" : 1, "_id" : 0})
+	#for hey in deckmap1:
+		#deckerino1 = hey["Decks"]
 	#return a random deck
-	deckchoice1 = random.choice(deckerino1)
+	#deckchoice1 = random.choice(deckerino1)
 	
 	#get the cards from the random deck
 	#cards1 = db.decks.find({"DeckName" : deckchoice1}, {"Cards" : 1, "_id" : 0})
@@ -210,17 +210,24 @@ def setup_game() -> ".game.Game":
 	#for every in carderino1:
 	#	deck1.append(cards.filter(name=every)[0])
 	
-	cards2 = db.decks.find({"DeckName" : "Hand Lock"}, {"Cards" : 1, "_id" : 0})
-	for neat in cards2:
+	cards1 = db.decks.find({"DeckName" : "Hand Lock"}, {"Cards" : 1, "_id" : 0})
+	for neat in cards1:
 		carderino2 = neat["Cards"]
 	
-	deck2 = []
+	deck1 = []
 	for hello in carderino2:
-		deck2.append(cards.filter(name=hello)[0])
+		deck1.append(cards.filter(name=hello)[0])
 
-	deck1 = random_draft(CardClass.HUNTER)
-	player2 = Player("Player2", deck1, CardClass.HUNTER.default_hero)
-	player1 = Player("Player1", deck2, CardClass.WARLOCK.default_hero)
+	cards2 = db.decks.find({"DeckName":"Midrange Beast Gadgetzan"},{"Cards":1,"_id":0})
+	for something in cards2:
+		deckList = something["Cards"]
+
+	deck2 = []
+	for card in deckList:
+		deck2.append(cards.filter(name=card)[0])
+	#deck2 = random_draft(CardClass.PALADIN)
+	player1 = Player("Player1", deck1, CardClass.WARLOCK.default_hero)
+	player2 = Player("Player2", deck2, CardClass.HUNTER.default_hero)
 
 	game = Game(players=(player1, player2))
 	game.start()
@@ -268,7 +275,7 @@ def play_random_turn(player):
 
 			if player.choice:
 				choice = random.choice(player.choice.cards)
-				print("Choosing card %r" % (choice))
+				#print("Choosing card %r" % (choice))
 				player.choice.choose(choice)
 
 			continue

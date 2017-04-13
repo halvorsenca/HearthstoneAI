@@ -31,9 +31,7 @@ class Player():
 	def train(self):
 		for _ in range(0, int(input("How many games: "))):
 			try:
-				print("About to startup the game!")
 				game = setup_game()
-				print("Game setup!")
 
 ### This came from utils.py
 				for player in game.players:
@@ -45,26 +43,22 @@ class Player():
 
 				self.turnSeq = []
 # Play each turn
-				print("Game is about to start!")
 				while True:
-					currState = self.extract_gamestate(game)
-					print(currState)
-					self.Visited[currState] += 1
 					#if self.Visited[currState] > 100000:
-						#print("This shouldn't run")
 						#self.play_optimal(game, currState)
 					#else:
 					if game.players[0].current_player:
+						currState = self.extract_gamestate(game)
+						self.Visited[currState] += 1
 						self.play_random(game, currState)
+						self.calcQualities()
 					elif game.players[1].current_player:
 						play_turn(game)
-					#self.calcQualities()
 			except GameOver:
-				#self.calcQualities()
+				self.calcQualities()
 				currState = self.extract_gamestate(game)
-				print(currState)
 				self.turnSeq.append((currState, -1))
-				#self.calcQualities()
+				self.calcQualities()
 				log.info("Game Completed")
 
 # TODO: Need to switch to using JSON because pkl could loss information
@@ -80,13 +74,16 @@ class Player():
 
 		while not did_action:
 			action = random.choice(self.Moves)
+			#print("Attempting action: ", action.__name__)
 			did_action = action(game)
+			#print("Finished Action: ", did_action)
 
-		self.turnSeq.append((currState, action))
+		self.turnSeq.append((currState, action.__name__))
 
 		if self.Visited[self.turnSeq[-1][0]] == 1:
 			for move in self.Moves:
-				self.StateQualities[(self.turnSeq[-1][0],move)] = 0
+				self.StateQualities[(self.turnSeq[-1][0],move.__name__)] = 0
+		#print(self.StateQualities)
 
 	def extract_gamestate(self, game):
 		myHealth = game.players[0].hero.health + game.players[0].hero.armor
@@ -125,19 +122,21 @@ class Player():
 		else:
 			if self.turnSeq[-1][1] == -1:
 				bestaction = 0
-# If I have more health then I won
-# TODO: This logic might have to change
-# Could also add rewards for having card advantage
 				if self.turnSeq[-1][0][0] > 0:
 					reward = 100
 				else:
 					reward = -100
 			else:
-				reward = 0
+				if self.turnSeq[-1][0][3] > 0:
+					reward = 1
+				elif self.turnSeq[-1][0][3] < 0:
+					reward = -1
+				else:
+					reward = 0
 				directions = []
 				for move in self.Moves:
-					directions.append(self.StateQualities[(self.turnSeq[-1][0],move)])
-				bestaction = self.StateQualities[(self.turnSeq[-1][0],self.Moves[directions.index(max(directions))])]
+					directions.append(self.StateQualities[(self.turnSeq[-1][0],move.__name__)])
+				bestaction = self.StateQualities[(self.turnSeq[-1][0],self.Moves[directions.index(max(directions))].__name__)] # Need to figure out better way to query Moves
 			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction)
 				-self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
 
