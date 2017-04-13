@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys; sys.path.append("..")
 import logging
+import threading
 from fireplace.logging import get_logger 
 from fireplace import cards
 from fireplace.exceptions import GameOver
@@ -20,11 +21,26 @@ from fireplace.ai import Player
 ##
 
 def test_full_game():
-	player = Player()
+	numThreads = int(input("How many players: "))
+	numGames = int(input("How many games per player: "))
+
 	verbosity = input("Silent(s) or Verbose(v): ")
 	if verbosity == 's':
 		log = get_logger("fireplace", logging.WARNING) 
-	player.train()
+
+	threads = []
+	for i in range(0, numThreads):
+		thread = threading.Thread(target=Player, args = (numGames,i))
+		thread.start()
+		threads.append(thread)
+
+	print("Started all threads successfully!")
+
+# Wait for threads to finish
+	for thread in threads:
+		thread.join()
+
+	print("Finished!")
 	#try:
     # This will start the game
 		#play_full_game()

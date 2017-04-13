@@ -8,7 +8,7 @@ import random
 import pickle
 
 class Player():
-	def __init__(self):
+	def __init__(self, numGames, threadNum):
 		if os.path.isfile('StateQualities.pkl'):
 			with open('StateQualities.pkl', 'rb') as f:
 				print("Loading File")
@@ -22,16 +22,27 @@ class Player():
 		else:
 			# This initializes every new entry with a zero
 			self.Visited = defaultdict(self.zero)
+
 		self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
 								trade_minions, wipe_field, attack_hero, use_hero_power, end_turn]
 		self.turnSeq = []
+		self.threadNum = threadNum
+
+		self.train(numGames)
+
+# TODO: Need to switch to using JSON because pkl could loss information
+		with open('Output/StateQualities'+str(self.threadNum)+'.pkl', 'wb') as f:
+			pickle.dump(self.StateQualities, f, pickle.HIGHEST_PROTOCOL)
+		with open('Output/Visited'+str(self.threadNum)+'.pkl', 'wb') as f:
+			pickle.dump(self.Visited, f, pickle.HIGHEST_PROTOCOL)
+
 
 # Need this functions so that Visited can be pickled...
 	def zero(self):
 		return 0
 
-	def train(self):
-		for _ in range(0, int(input("How many games: "))):
+	def train(self, numGames):
+		for _ in range(0, numGames):
 			try:
 				game = setup_game()
 
@@ -62,16 +73,6 @@ class Player():
 				self.turnSeq.append((currState, -1))
 				self.calcQualities()
 				log.info("Game Completed")
-				import pprint
-				pp = pprint.PrettyPrinter(indent=2)
-				pp.pprint(self.StateQualities)
-
-# TODO: Need to switch to using JSON because pkl could loss information
-		with open('StateQualities.pkl', 'wb') as f:
-			pickle.dump(self.StateQualities, f, pickle.HIGHEST_PROTOCOL)
-		with open('Visited.pkl', 'wb') as f:
-			pickle.dump(self.Visited, f, pickle.HIGHEST_PROTOCOL)
-
 
 	def play_random(self, game, currState):
 		did_action = False
