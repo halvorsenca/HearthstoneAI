@@ -80,16 +80,13 @@ class Player():
 
 		while not did_action:
 			action = random.choice(self.Moves)
-			#print("Attempting action: ", action.__name__)
 			did_action = action(game)
-			#print("Finished Action: ", did_action)
 
 		self.turnSeq.append((currState, action.__name__))
 
-		if self.Visited[self.turnSeq[-1][0]] == 1:
-			for move in self.Moves:
-				self.StateQualities[(self.turnSeq[-1][0],move.__name__)] = 0
-		#print(self.StateQualities)
+		#if self.Visited[self.turnSeq[-1][0]] == 1:
+			#for move in self.Moves:
+				#self.StateQualities[(self.turnSeq[-1][0],move.__name__)] = 0
 
 	def extract_gamestate(self, game):
 		myHealth = game.players[0].hero.health + game.players[0].hero.armor
@@ -133,18 +130,16 @@ class Player():
 				else:
 					reward = -100
 			else:
-				if self.turnSeq[-1][0][3] > 0:
-					reward = 1
-				elif self.turnSeq[-1][0][3] < 0:
-					reward = -1
-				else:
-					reward = 0
+				reward = self.turnSeq[-1][0][3]
 				directions = []
 				for move in self.Moves:
+					if not (self.turnSeq[-1][0], move.__name__) in self.StateQualities.keys():
+						self.StateQualities[(self.turnSeq[-1][0], move.__name__)] = 0
 					directions.append(self.StateQualities[(self.turnSeq[-1][0],move.__name__)])
 				bestaction = self.StateQualities[(self.turnSeq[-1][0],self.Moves[directions.index(max(directions))].__name__)] # Need to figure out better way to query Moves
-			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction)
-				-self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
+			if not self.turnSeq[-2] in self.StateQualities.keys():
+				self.StateQualities[self.turnSeq[-2]] = 0
+			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction) - self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
 
 	"""
 	Will have to update this to reflect updates before making optimal plays
