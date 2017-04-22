@@ -8,7 +8,7 @@ import random
 import json
 
 class Player():
-	def __init__(self, numGames, threadNum):
+	def __init__(self, numGames, threadNum, deck1, deck2):
 		if os.path.isfile('StateQualities.json'):
 			with open('StateQualities.json', 'r') as infile:
 				self.StateQualities = json.load(infile)
@@ -26,7 +26,7 @@ class Player():
 		self.turnSeq = []
 		self.threadNum = threadNum
 
-		self.train(numGames)
+		self.train(numGames, deck1, deck2)
 
 		with open('Output/StateQualities'+str(self.threadNum)+'.json', 'w') as outfile:
 			tmp = {}
@@ -39,10 +39,10 @@ class Player():
 				tmp[str(key)] = value
 			json.dump(tmp, outfile)
 
-	def train(self, numGames):
+	def train(self, numGames, deck1, deck2):
 		for _ in range(0, numGames):
 			try:
-				game = setup_game()
+				game = setup_game(deck1, deck2)
 
 ### This came from utils.py
 				for player in game.players:

@@ -168,64 +168,10 @@ def weighted_card_choice(source, weights: List[int], card_sets: List[str], count
 	return [source.controller.card(card, source=source) for card in chosen_cards]
 
 
-def setup_game() -> ".game.Game":
+def setup_game(deck1, deck2) -> ".game.Game":
 	from .game import Game
 	from .player import Player
 
-	from pymongo import MongoClient
-
-	client = MongoClient()
-	db = client.test
-
-	heromap = {
-		"WARRIOR": CardClass.WARRIOR.default_hero,
-		"DRUID": CardClass.DRUID.default_hero,
-		"HUNTER": CardClass.HUNTER.default_hero,
-		"MAGE": CardClass.MAGE.default_hero,
-		"PALADIN": CardClass.PALADIN.default_hero,
-		"PRIEST": CardClass.PRIEST.default_hero,
-		"ROGUE": CardClass.ROGUE.default_hero,
-		"WARLOCK": CardClass.WARLOCK.default_hero,
-		"SHAMAN": CardClass.SHAMAN.default_hero,
-	}
-
-	#get a random hero
-	#hero1 = random.choice(list(heromap.keys()))
-	#hero1lower = hero1.lower()
-
-	#get the decks from the hero
-	#deckmap1 = db.heroes.find({"HeroName" : hero1lower}, {"Decks" : 1, "_id" : 0})
-	#for hey in deckmap1:
-		#deckerino1 = hey["Decks"]
-	#return a random deck
-	#deckchoice1 = random.choice(deckerino1)
-	
-	#get the cards from the random deck
-	#cards1 = db.decks.find({"DeckName" : deckchoice1}, {"Cards" : 1, "_id" : 0})
-	#for hi in cards1:
-	#	carderino1 = hi["Cards"]
-
-	#create the deck from the ground up 
-	#deck1 = []
-	#for every in carderino1:
-	#	deck1.append(cards.filter(name=every)[0])
-	
-	cards1 = db.decks.find({"DeckName" : "Hand Lock"}, {"Cards" : 1, "_id" : 0})
-	for neat in cards1:
-		carderino2 = neat["Cards"]
-	
-	deck1 = []
-	for hello in carderino2:
-		deck1.append(cards.filter(name=hello)[0])
-
-	cards2 = db.decks.find({"DeckName":"Midrange Beast Gadgetzan"},{"Cards":1,"_id":0})
-	for something in cards2:
-		deckList = something["Cards"]
-
-	deck2 = []
-	for card in deckList:
-		deck2.append(cards.filter(name=card)[0])
-	#deck2 = random_draft(CardClass.PALADIN)
 	player1 = Player("Player1", deck1, CardClass.WARLOCK.default_hero)
 	player2 = Player("Player2", deck2, CardClass.HUNTER.default_hero)
 

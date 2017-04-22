@@ -8,6 +8,8 @@ from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
 from fireplace.ai import Player
+from hearthstone.enums import CardClass
+from pymongo import MongoClient
 ##
 # If you get an error about not being able to import cards
 # then make sure you run './setup install' using python3.
@@ -29,10 +31,41 @@ def test_full_game():
 	if verbosity == 's':
 		log = get_logger("fireplace", logging.WARNING) 
 
+	client = MongoClient()
+	db = client.test
+
+	heromap = {
+		"WARRIOR": CardClass.WARRIOR.default_hero,
+		"DRUID": CardClass.DRUID.default_hero,
+		"HUNTER": CardClass.HUNTER.default_hero,
+		"MAGE": CardClass.MAGE.default_hero,
+		"PALADIN": CardClass.PALADIN.default_hero,
+		"PRIEST": CardClass.PRIEST.default_hero,
+		"ROGUE": CardClass.ROGUE.default_hero,
+		"WARLOCK": CardClass.WARLOCK.default_hero,
+		"SHAMAN": CardClass.SHAMAN.default_hero,
+	}
+
+	cards1 = db.decks.find({"DeckName" : "Hand Lock"}, {"Cards" : 1, "_id" : 0})
+	for neat in cards1:
+		carderino2 = neat["Cards"]
+	
+	deck1 = []
+	for hello in carderino2:
+		deck1.append(cards.filter(name=hello)[0])
+
+	cards2 = db.decks.find({"DeckName":"Midrange Beast Gadgetzan"},{"Cards":1,"_id":0})
+	for something in cards2:
+		deckList = something["Cards"]
+
+	deck2 = []
+	for card in deckList:
+		deck2.append(cards.filter(name=card)[0])
+
 	start_time = time.time()
 	threads = []
 	for i in range(0, numThreads):
-		thread = threading.Thread(target=Player, args = (numGames,i))
+		thread = threading.Thread(target=Player, args = (numGames,i,deck1,deck2))
 		time.sleep(0.1)
 		thread.start()
 		threads.append(thread)
