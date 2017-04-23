@@ -57,7 +57,7 @@ class Player():
 						if not currState in self.Visited.keys():
 							self.Visited[currState] = 0
 						self.Visited[currState] += 1
-						if self.Visited[currState] > 50000:
+						if self.Visited[currState] > 500000:
 							self.play_optimal(game, currState)
 						else:
 							self.play_random(game, currState)

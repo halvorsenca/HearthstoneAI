@@ -32,7 +32,8 @@ for f in files:
 StateQualities = {}
 Visited = {}
 
-for _ in range(0, len(files)):
+for j in range(0, len(ThreadQualities)):
+	print("Starting file", j)
 	q = []
 	v = []
 	loopQualities = ThreadQualities.pop(0)
@@ -55,7 +56,9 @@ for _ in range(0, len(files)):
 			Visited[key[0]] += totalV
 		else:
 			Visited[key[0]] = totalV
+	print("Finished file", j)
 		
+print("Writing new files")
 with open('StateQualities.json', 'w') as outfile:
 	tmp = {}
 	for key, value in StateQualities.items():
