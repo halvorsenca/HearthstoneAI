@@ -32,7 +32,11 @@ class Player():
 			json.dump(tmp, outfile)
 
 	def train(self, numGames, deck1, deck2):
-		for _ in range(0, numGames):
+		percent = 10
+		for i in range(0, numGames):
+			if (i/numGames)*100 >= percent:
+				print("Thread %d: %d%%" % (self.threadNum, percent))
+				percent += 10
 			try:
 				game = setup_game(deck1, deck2)
 

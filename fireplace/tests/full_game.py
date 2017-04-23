@@ -124,10 +124,14 @@ def test_full_game():
 		loopQualities = ThreadQualities.pop(0)
 		loopVisited = ThreadVisited.pop(0)
 		for key, value in loopQualities.items():
+			if value == 0:
+				continue
 			for i in range(0, len(ThreadQualities)):
 				if key in ThreadQualities[i].keys():
-					q.append(ThreadQualities[i].pop(key))
-					v.append(ThreadVisited[i][key[0]])
+					x = ThreadQualities[i].pop(key)
+					if x != 0:
+						q.append(x)
+						v.append(ThreadVisited[i][key[0]])
 			totalV= sum(v) + loopVisited[key[0]]
 			avgQ = value * (loopVisited[key[0]] / totalV)
 			for i in range(0, len(q)):
