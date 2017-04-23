@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import sys; sys.path.append("..")
+import os.path
 import logging
 import threading
 import time
+import json
 from fireplace.logging import get_logger 
 from fireplace import cards
 from fireplace.exceptions import GameOver
@@ -10,6 +12,7 @@ from fireplace.utils import play_full_game
 from fireplace.ai import Player
 from hearthstone.enums import CardClass
 from pymongo import MongoClient
+from ast import literal_eval
 ##
 # If you get an error about not being able to import cards
 # then make sure you run './setup install' using python3.
@@ -62,10 +65,25 @@ def test_full_game():
 	for card in deckList:
 		deck2.append(cards.filter(name=card)[0])
 
+	StateQualities = {}
+	if os.path.isfile('StateQualities.json'):
+		with open('StateQualities.json', 'r') as infile:
+			tmp = json.load(infile)
+		for key, value in tmp.items():
+			StateQualities[literal_eval(key)] = value
+
+	Visited = {}
+	if os.path.isfile('Visited.json'):
+		with open('Visited.json', 'r') as infile:
+			tmp = json.load(infile)
+		for key, value in tmp.items():
+			Visited[literal_eval(key)] = value
+
+	print("Starting all threads...")
 	start_time = time.time()
 	threads = []
 	for i in range(0, numThreads):
-		thread = threading.Thread(target=Player, args = (numGames,i,deck1,deck2))
+		thread = threading.Thread(target=Player, args = (StateQualities.copy(),Visited.copy(),numGames,i,deck1,deck2))
 		time.sleep(0.1)
 		thread.start()
 		threads.append(thread)
@@ -79,13 +97,60 @@ def test_full_game():
 	finish_time = time.time()
 
 	print("Finish time: ", finish_time - start_time)
-	#try:
-    # This will start the game
-		#play_full_game()
-	#except GameOver:
-    # This will always run whenever the game ends.
-		#print("Game completed normally.")
+# Start to merge files
+	print("Merging Files... This may take a while!")
+	ThreadQualities = []
+	ThreadVisited = []
+	for i in range(0,numThreads):
+		with open('Output/StateQualities'+str(i)+'.json', 'r') as infile:
+			tmp = json.load(infile)
+			ThreadQualities.append({})
+			for key, value in tmp.items():
+				ThreadQualities[-1][literal_eval(key)] = value
 
+		with open('Output/Visited'+str(i)+'.json', 'r') as infile:
+			tmp = json.load(infile)
+			ThreadVisited.append({})
+			for key, value in tmp.items():
+				ThreadVisited[-1][literal_eval(key)] = value
+
+## Average together all the values output from threads
+	StateQualities = {}
+	Visited = {}
+
+	for _ in range(0, numThreads):
+		q = []
+		v = []
+		loopQualities = ThreadQualities.pop(0)
+		loopVisited = ThreadVisited.pop(0)
+		for key, value in loopQualities.items():
+			for i in range(0, len(ThreadQualities)):
+				if key in ThreadQualities[i].keys():
+					q.append(ThreadQualities[i].pop(key))
+					v.append(ThreadVisited[i][key[0]])
+			totalV= sum(v) + loopVisited[key[0]]
+			avgQ = value * (loopVisited[key[0]] / totalV)
+			for i in range(0, len(q)):
+				avgQ += q[i] * (v[i] / totalV)
+			StateQualities[key] = avgQ
+			if key[0] in Visited.keys():
+				Visited[key[0]] += totalV
+			else:
+				Visited[key[0]] = totalV
+			
+	with open('StateQualities.json', 'w') as outfile:
+		tmp = {}
+		for key, value in StateQualities.items():
+			tmp[str(key)] = value
+		json.dump(tmp, outfile)
+	with open('Visited.json', 'w') as outfile:
+		tmp = {}
+		for key, value in Visited.items():
+			tmp[str(key)] = value
+		json.dump(tmp, outfile)
+
+	print("Done!")
+			
 
 # Don't need to worry about this
 def main():

@@ -8,18 +8,9 @@ import random
 import json
 
 class Player():
-	def __init__(self, numGames, threadNum, deck1, deck2):
-		if os.path.isfile('StateQualities.json'):
-			with open('StateQualities.json', 'r') as infile:
-				self.StateQualities = json.load(infile)
-		else:
-			self.StateQualities = {}
-		if os.path.isfile('Visited.json'):
-			with open('Visited.json', 'r') as infile:
-				self.Visited = json.load(infile)
-		else:
-			# This initializes every new entry with a zero
-			self.Visited = {}
+	def __init__(self, StateQualities, Visited, numGames, threadNum, deck1, deck2):
+		self.StateQualities = StateQualities
+		self.Visited = Visited
 
 		self.Moves = [play_offensive, play_defensive, play_utility, trade_spell,
 								trade_minions, wipe_field, attack_hero, use_hero_power, end_turn]
@@ -28,6 +19,7 @@ class Player():
 
 		self.train(numGames, deck1, deck2)
 
+		print("Thread %d outputting file" % self.threadNum)
 		with open('Output/StateQualities'+str(self.threadNum)+'.json', 'w') as outfile:
 			tmp = {}
 			for key, value in self.StateQualities.items():
