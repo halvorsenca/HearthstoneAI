@@ -37,18 +37,6 @@ def test_full_game():
 	client = MongoClient()
 	db = client.test
 
-	heromap = {
-		"WARRIOR": CardClass.WARRIOR.default_hero,
-		"DRUID": CardClass.DRUID.default_hero,
-		"HUNTER": CardClass.HUNTER.default_hero,
-		"MAGE": CardClass.MAGE.default_hero,
-		"PALADIN": CardClass.PALADIN.default_hero,
-		"PRIEST": CardClass.PRIEST.default_hero,
-		"ROGUE": CardClass.ROGUE.default_hero,
-		"WARLOCK": CardClass.WARLOCK.default_hero,
-		"SHAMAN": CardClass.SHAMAN.default_hero,
-	}
-
 	cards1 = db.decks.find({"DeckName" : "Hand Lock"}, {"Cards" : 1, "_id" : 0})
 	for neat in cards1:
 		carderino2 = neat["Cards"]
@@ -82,17 +70,21 @@ def test_full_game():
 	print("Starting all threads...")
 	start_time = time.time()
 	threads = []
-	for i in range(0, numThreads):
-		thread = threading.Thread(target=Player, args = (StateQualities.copy(),Visited.copy(),numGames,i,deck1,deck2))
-		time.sleep(0.1)
-		thread.start()
-		threads.append(thread)
+	if numThreads == 1:
+		Player(StateQualities.copy(),Visited.copy(),numGames,0,deck1,deck2)
+	else:
+		for i in range(0, numThreads):
+			thread = threading.Thread(target=Player, args = (StateQualities.copy(),Visited.copy(),numGames,i,deck1,deck2))
+			time.sleep(0.1)
+			thread.start()
+			threads.append(thread)
 
 	print("Started all threads successfully!")
 
 # Wait for threads to finish
-	for thread in threads:
-		thread.join()
+	if numThreads != 1:
+		for thread in threads:
+			thread.join()
 
 	finish_time = time.time()
 

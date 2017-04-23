@@ -62,6 +62,7 @@ class Player():
 							self.play_random(game, currState)
 						self.calcQualities()
 					elif game.players[1].current_player:
+						print("Opponent plays")
 						play_turn(game)
 			except GameOver:
 				self.calcQualities()
@@ -81,15 +82,16 @@ class Player():
 		self.turnSeq.append((currState, action.__name__))
 
 	def play_optimal(self, game, currState):
+		directions = []
 		for move in self.Moves:
-			if not (self.turnSeq[-1][0], move.__name__) in self.StateQualities.keys():
-				self.StateQualities[(self.turnSeq[-1][0], move.__name__)] = 0
-			directions.append(self.StateQualities[(self.turnSeq[-1][0],move.__name__)])
+			if not (currState, move.__name__) in self.StateQualities.keys():
+				self.StateQualities[(currState, move.__name__)] = 0
+			directions.append((move, self.StateQualities[(currState, move.__name__)]))
 
-		directions.sort(reverse=True)
+		directions.sort(key=lambda x:x[1], reverse=True)
 
-		for i in range(0,len(directions)):
-			action = self.Moves[directions.index(directions[i])]
+		for direction in directions:
+			action = direction[0]
 			did_action = action(game)
 			if did_action:
 				break
