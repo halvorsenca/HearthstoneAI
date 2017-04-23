@@ -51,15 +51,15 @@ class Player():
 				self.turnSeq = []
 # Play each turn
 				while True:
-					#if self.Visited[currState] > 100000:
-						#self.play_optimal(game, currState)
-					#else:
 					if game.players[0].current_player:
 						currState = self.extract_gamestate(game)
 						if not currState in self.Visited.keys():
 							self.Visited[currState] = 0
 						self.Visited[currState] += 1
-						self.play_random(game, currState)
+						if self.Visited[currState] > 50000:
+							self.play_optimal(game, currState)
+						else:
+							self.play_random(game, currState)
 						self.calcQualities()
 					elif game.players[1].current_player:
 						play_turn(game)
@@ -80,9 +80,21 @@ class Player():
 
 		self.turnSeq.append((currState, action.__name__))
 
-		#if self.Visited[self.turnSeq[-1][0]] == 1:
-			#for move in self.Moves:
-				#self.StateQualities[(self.turnSeq[-1][0],move.__name__)] = 0
+	def play_optimal(self, game, currState):
+		for move in self.Moves:
+			if not (self.turnSeq[-1][0], move.__name__) in self.StateQualities.keys():
+				self.StateQualities[(self.turnSeq[-1][0], move.__name__)] = 0
+			directions.append(self.StateQualities[(self.turnSeq[-1][0],move.__name__)])
+
+		directions.sort(reverse=True)
+
+		for i in range(0,len(directions)):
+			action = self.Moves[directions.index(directions[i])]
+			did_action = action(game)
+			if did_action:
+				break
+
+		self.turnSeq.append((currState, action.__name__))
 
 	def extract_gamestate(self, game):
 		myHealth = game.players[0].hero.health + game.players[0].hero.armor
@@ -137,17 +149,3 @@ class Player():
 				self.StateQualities[self.turnSeq[-2]] = 0
 			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction) - self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
 
-	"""
-	Will have to update this to reflect updates before making optimal plays
-	but don't really need it until after the game has been trained
-	def play_optimal(self, game, currState):
-		directions = [
-			self.StateQualities[(currState,self.Moves[0])],
-			self.StateQualities[(currState,self.Moves[1])],
-			self.StateQualities[(currState,self.Moves[2])],
-			self.StateQualities[(currState,self.Moves[3])]
-		]
-		action = self.Moves[directions.index(max(directions))]
-		self.turnSeq.append((game.currState, action))
-		game.tryMove(action)
-	"""
