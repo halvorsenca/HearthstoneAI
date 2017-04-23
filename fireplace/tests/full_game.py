@@ -67,7 +67,8 @@ def test_full_game():
 		for key, value in tmp.items():
 			Visited[literal_eval(key)] = value
 
-	print("Starting all threads...")
+	if numThreads != 1:
+		print("Starting all threads...")
 	start_time = time.time()
 	threads = []
 	if numThreads == 1:
@@ -79,7 +80,8 @@ def test_full_game():
 			thread.start()
 			threads.append(thread)
 
-	print("Started all threads successfully!")
+	if numThreads != 1:
+		print("Started all threads successfully!")
 
 # Wait for threads to finish
 	if numThreads != 1:

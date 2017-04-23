@@ -1,6 +1,7 @@
 from fireplace.exceptions import GameOver
 from .logging import log 
 from fireplace.utils import setup_game, play_turn
+from hearthstone.enums import PlayState
 from collections import defaultdict
 from fireplace.playerbot import play_offensive, play_defensive, play_utility, trade_spell, trade_minions, wipe_field, attack_hero, use_hero_power, end_turn
 import os.path
@@ -33,13 +34,13 @@ class Player():
 
 	def train(self, numGames, deck1, deck2):
 		percent = 10
+		gamesWon = 0
 		for i in range(0, numGames):
 			if (i/numGames)*100 >= percent:
 				print("Thread %d: %d%%" % (self.threadNum, percent))
 				percent += 10
+			game = setup_game(deck1, deck2)
 			try:
-				game = setup_game(deck1, deck2)
-
 ### This came from utils.py
 				for player in game.players:
 					log.info("Can mulligan %r" % (player.choice.cards))
@@ -62,14 +63,16 @@ class Player():
 							self.play_random(game, currState)
 						self.calcQualities()
 					elif game.players[1].current_player:
-						print("Opponent plays")
 						play_turn(game)
 			except GameOver:
 				self.calcQualities()
 				currState = self.extract_gamestate(game)
 				self.turnSeq.append((currState, -1))
 				self.calcQualities()
+				if game.players[0].playstate == PlayState.WON:
+					gamesWon += 1
 				log.info("Game Completed")
+		print("Thread", self.threadNum, "Win Rate:", (gamesWon / numGames)*100, "%")
 
 	def play_random(self, game, currState):
 		did_action = False
