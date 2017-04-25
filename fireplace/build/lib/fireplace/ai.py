@@ -57,7 +57,7 @@ class Player():
 						if not currState in self.Visited.keys():
 							self.Visited[currState] = 0
 						self.Visited[currState] += 1
-						if self.Visited[currState] > 500000:
+						if self.Visited[currState] > 1000000:
 							self.play_optimal(game, currState)
 						else:
 							self.play_random(game, currState)
@@ -139,11 +139,11 @@ class Player():
 			if self.turnSeq[-1][1] == -1:
 				bestaction = 0
 				if self.turnSeq[-1][0][0] > 0:
-					reward = 100
+					reward = 1000
 				else:
-					reward = -100
+					reward = -1000
 			else:
-				reward = self.turnSeq[-1][0][3]
+				reward = 0
 				directions = []
 				for move in self.Moves:
 					if not (self.turnSeq[-1][0], move.__name__) in self.StateQualities.keys():

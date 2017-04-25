@@ -152,5 +152,5 @@ class Player():
 				bestaction = self.StateQualities[(self.turnSeq[-1][0],self.Moves[directions.index(max(directions))].__name__)] # Need to figure out better way to query Moves
 			if not self.turnSeq[-2] in self.StateQualities.keys():
 				self.StateQualities[self.turnSeq[-2]] = 0
-			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction) - self.StateQualities[self.turnSeq[-2]]) / self.Visited[self.turnSeq[-2][0]]
+			self.StateQualities[self.turnSeq[-2]] += (reward + (0.9*bestaction) - self.StateQualities[self.turnSeq[-2]])# / self.Visited[self.turnSeq[-2][0]]
 
