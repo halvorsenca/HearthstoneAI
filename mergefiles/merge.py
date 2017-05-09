@@ -21,12 +21,12 @@ for f in files:
 		with open('Files/'+f, 'r') as infile:
 			tmp = json.load(infile)
 			for key, value in tmp.items():
-				ThreadQualities[int(''.join([x for x in f if x.isdigit()]))][literal_eval(key)] = value
+				ThreadQualities[int(''.join([x for x in f if x.isdigit()]))-1][literal_eval(key)] = value
 	elif "Visited" in f:
 		with open('Files/'+f, 'r') as infile:
 			tmp = json.load(infile)
 			for key, value in tmp.items():
-				ThreadVisited[int(''.join([x for x in f if x.isdigit()]))][literal_eval(key)] = value
+				ThreadVisited[int(''.join([x for x in f if x.isdigit()]))-1][literal_eval(key)] = value
 
 ## Average together all the values output from threads
 StateQualities = {}

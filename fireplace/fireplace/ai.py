@@ -1,3 +1,4 @@
+import sys
 from fireplace.exceptions import GameOver
 from .logging import log 
 from fireplace.utils import setup_game, play_turn
@@ -57,7 +58,7 @@ class Player():
 						if not currState in self.Visited.keys():
 							self.Visited[currState] = 0
 						self.Visited[currState] += 1
-						if self.Visited[currState] > 1000000:
+						if self.Visited[currState] > 100:#sys.maxsize:
 							self.play_optimal(game, currState)
 						else:
 							self.play_random(game, currState)
@@ -82,6 +83,8 @@ class Player():
 			action = random.choice(self.Moves)
 			did_action = action(game)
 
+		log.info("Performed action %s in state %s" % (action.__name__, currState))
+
 		self.turnSeq.append((currState, action.__name__))
 
 	def play_optimal(self, game, currState):
@@ -97,6 +100,7 @@ class Player():
 			action = direction[0]
 			did_action = action(game)
 			if did_action:
+				log.info("Performed action %s in state %s" % (action.__name__, currState))
 				break
 
 		self.turnSeq.append((currState, action.__name__))
